@@ -77,6 +77,24 @@ const createRental = async (req, res) => {
             });
         }
 
+        const [activeMaintenance] = await connection.query(
+            `SELECT maintenance_id
+            FROM MAINTENANCE
+            WHERE plate_number = ?
+            AND maintenance_status = 'Active'
+            LIMIT 1`,
+            [plate_number]
+        );
+
+        if (activeMaintenance.length > 0) {
+            await connection.rollback();
+
+            return res.status(409).json({
+                success: false,
+                message: "Vehicle is currently under maintenance and cannot be rented"
+            });
+        }
+
 
         /*
          * Check for an overlapping ACTIVE rental.
