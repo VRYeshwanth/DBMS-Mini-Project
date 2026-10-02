@@ -1,8 +1,44 @@
 const express = require("express");
 const router = express.Router();
 
-const { getAllVehicles } = require("../controllers/vehicleController");
+const {
+    getAllVehicles,
+    getVehicleByPlateNumber,
+    createVehicle,
+    updateVehicle,
+    deleteVehicle
+} = require("../controllers/vehicleController");
 
+const authenticate = require("../middleware/authMiddleware");
+const authorizeRoles = require("../middleware/roleMiddleware");
+
+
+// Public
 router.get("/", getAllVehicles);
+router.get("/:plateNumber", getVehicleByPlateNumber);
+
+
+// Admin only
+router.post(
+    "/",
+    authenticate,
+    authorizeRoles("admin"),
+    createVehicle
+);
+
+router.put(
+    "/:plateNumber",
+    authenticate,
+    authorizeRoles("admin"),
+    updateVehicle
+);
+
+router.delete(
+    "/:plateNumber",
+    authenticate,
+    authorizeRoles("admin"),
+    deleteVehicle
+);
+
 
 module.exports = router;
