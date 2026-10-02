@@ -5,6 +5,7 @@ const vehicleRoutes = require("./routes/vehicleRoutes");
 const authRoutes = require("./routes/authRoutes");
 const rentalRoutes = require("./routes/rentalRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
+const maintenanceRoutes = require("./routes/maintenanceRoutes");
 
 const app = express();
 
@@ -24,5 +25,6 @@ app.use("/api/auth", authRoutes);
 app.use("/api/vehicles", vehicleRoutes);
 app.use("/api/rentals", rentalRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/maintenance", maintenanceRoutes);
 
 module.exports = app;
