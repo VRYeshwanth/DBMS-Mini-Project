@@ -285,11 +285,62 @@ const deleteVehicle = async (req, res) => {
     }
 };
 
+const getAvailableVehicles = async (req, res) => {
+    try {
+        const [rows] = await pool.query(`
+            SELECT
+                v.plate_number,
+                v.make,
+                v.type,
+                v.model,
+                v.year,
+                v.color,
+                v.branch_id,
+                b.name AS branch_name,
+                b.address AS branch_address
+            FROM VEHICLE v
+            JOIN BRANCH b
+                ON v.branch_id = b.branch_id
+            WHERE NOT EXISTS (
+                SELECT 1
+                FROM RENTAL r
+                WHERE r.plate_number = v.plate_number
+                  AND r.status = 'Active'
+            )
+            AND NOT EXISTS (
+                SELECT 1
+                FROM MAINTENANCE m
+                WHERE m.plate_number = v.plate_number
+                  AND m.maintenance_status = 'Active'
+            )
+            ORDER BY v.plate_number
+        `);
+
+        res.status(200).json({
+            success: true,
+            count: rows.length,
+            data: rows
+        });
+
+    } catch (error) {
+        console.error(
+            "Get available vehicles error:",
+            error.message
+        );
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch available vehicles"
+        });
+    }
+};
+
 
 module.exports = {
     getAllVehicles,
     getVehicleByPlateNumber,
     createVehicle,
     updateVehicle,
-    deleteVehicle
+    deleteVehicle,
+    getAvailableVehicles
 };

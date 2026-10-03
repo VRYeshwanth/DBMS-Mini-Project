@@ -7,6 +7,8 @@ const rentalRoutes = require("./routes/rentalRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const maintenanceRoutes = require("./routes/maintenanceRoutes");
 const branchRoutes = require("./routes/branchRoutes");
+const customerRoutes = require("./routes/customerRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
 
 const app = express();
 
@@ -28,5 +30,7 @@ app.use("/api/rentals", rentalRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/maintenance", maintenanceRoutes);
 app.use("/api/branches", branchRoutes);
+app.use("/api/customers", customerRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 module.exports = app;

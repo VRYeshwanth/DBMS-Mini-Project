@@ -42,9 +42,10 @@ const createPayment = async (req, res) => {
         const [rentals] = await connection.query(
             `SELECT
                 r.rental_id,
-                r.customer_id
-             FROM RENTAL r
-             WHERE r.rental_id = ?`,
+                r.customer_id,
+                r.status
+            FROM RENTAL r
+            WHERE r.rental_id = ?`,
             [rental_id]
         );
 
@@ -58,6 +59,15 @@ const createPayment = async (req, res) => {
         }
 
         const rental = rentals[0];
+
+        if (rental.status !== "Active") {
+            await connection.rollback();
+
+            return res.status(400).json({
+                success: false,
+                message: "Payment can only be made for an active rental"
+            });
+        }
 
 
         /*

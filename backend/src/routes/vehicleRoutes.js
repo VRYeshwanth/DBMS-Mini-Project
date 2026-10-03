@@ -6,7 +6,8 @@ const {
     getVehicleByPlateNumber,
     createVehicle,
     updateVehicle,
-    deleteVehicle
+    deleteVehicle,
+    getAvailableVehicles
 } = require("../controllers/vehicleController");
 
 const authenticate = require("../middleware/authMiddleware");
@@ -15,6 +16,7 @@ const authorizeRoles = require("../middleware/roleMiddleware");
 
 // Public
 router.get("/", getAllVehicles);
+router.get("/available", getAvailableVehicles);
 router.get("/:plateNumber", getVehicleByPlateNumber);
 
 
