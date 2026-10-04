@@ -16,7 +16,6 @@ import {
   Clock,
   MapPin,
   Calendar,
-  Sparkles,
   ChevronRight,
   CreditCard
 } from 'lucide-react';
@@ -95,22 +94,6 @@ export const CustomerDashboard = () => {
         }} />
 
         <div style={{ maxWidth: 640, position: 'relative', zIndex: 1 }}>
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 8,
-            backgroundColor: 'rgba(245, 197, 24, 0.15)',
-            border: '1px solid rgba(245, 197, 24, 0.3)',
-            padding: '6px 14px',
-            borderRadius: 'var(--radius-full)',
-            fontSize: 13,
-            color: 'var(--primary)',
-            fontWeight: 600,
-            marginBottom: 16
-          }}>
-            <Sparkles size={15} />
-            DBMS University Mini-Project
-          </div>
 
           <h1 style={{
             fontSize: 36,
