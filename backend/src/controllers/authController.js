@@ -252,9 +252,71 @@ const getCurrentUser = async (req, res) => {
     }
 };
 
+const updateProfile = async (req, res) => {
+    const {
+        name,
+        address,
+        phone,
+        dob
+    } = req.body;
+
+    if (!name) {
+        return res.status(400).json({
+            success: false,
+            message: "Name is required"
+        });
+    }
+
+    try {
+        const [customers] = await pool.query(
+            `SELECT customer_id
+             FROM CUSTOMER
+             WHERE user_id = ?`,
+            [req.user.user_id]
+        );
+
+        if (customers.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Customer profile not found"
+            });
+        }
+
+        await pool.query(
+            `UPDATE CUSTOMER
+             SET name = ?,
+                 address = ?,
+                 phone = ?,
+                 dob = ?
+             WHERE user_id = ?`,
+            [
+                name,
+                address || null,
+                phone || null,
+                dob || null,
+                req.user.user_id
+            ]
+        );
+
+        res.status(200).json({
+            success: true,
+            message: "Profile updated successfully"
+        });
+
+    } catch (error) {
+        console.error("Update profile error:", error.message);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to update profile"
+        });
+    }
+};
+
 
 module.exports = {
     register,
     login,
-    getCurrentUser
+    getCurrentUser,
+    updateProfile
 };
