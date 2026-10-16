@@ -1,428 +1,387 @@
-# 🚗 Vehicle Rental Management System
+# Vehicle Rental Management System (VRMS)
 
-A university **DBMS Mini-Project** implementing the backend of a Vehicle Rental Management System using **Node.js, Express.js, and MySQL**. The current version focuses on the **REST API backend**, including authentication, vehicle management, rentals, payments, maintenance, branch management, customer management, and an admin dashboard.
-
----
-
-## 🛠️ Tech Stack
-
-* **Runtime:** Node.js
-* **Framework:** Express.js
-* **Database:** MySQL
-* **Authentication:** JWT
-* **Database Driver:** MySQL2
-* **API Testing:** Postman
+A full-stack DBMS mini-project for managing vehicle rentals, payments, maintenance, and branch operations. The database is designed around seven relational tables, with normalization to BCNF as a core project objective.
 
 ---
 
-## 📁 Project Structure
+## Features
+
+### Customer
+- Browse vehicles and check availability.
+- Book vehicles with pickup and return locations.
+- Simulate payments using UPI, card, or cash.
+- View booking confirmations, rental history, and profile details.
+
+### Admin
+- Manage vehicles, branches, rentals, customers, payments, and maintenance records.
+- View dashboard metrics, branch revenue, vehicle utilization, and maintenance expenses.
+
+---
+
+## Tech Stack
+
+| Layer | Technologies |
+|---|---|
+| Frontend | React, Vite, React Router, Axios |
+| Backend | Node.js, Express |
+| Database | MySQL 8, MySQL2 |
+| Authentication | JWT, bcrypt |
+
+---
+
+## Architecture
+
+1. **React frontend** handles the customer and admin interfaces.
+2. **Express REST API** processes requests and applies authentication and role-based access control.
+3. **MySQL database** stores application data and enforces relational constraints.
+4. **MySQL Event Scheduler** can automatically mark expired active rentals as completed.
+
+---
+
+## Database Design
+
+The database contains seven tables:
+
+| Table | Purpose |
+|---|---|
+| `USER_ACC` | Login credentials and user roles |
+| `CUSTOMER` | Customer profile details |
+| `BRANCH` | Pickup and return branches |
+| `VEHICLE` | Vehicle details and assigned branch |
+| `RENTAL` | Customer bookings and rental status |
+| `PAYMENT` | Rental payment records |
+| `MAINTENANCE` | Vehicle servicing records |
+
+Key DBMS concepts demonstrated:
+- BCNF normalization and functional dependencies.
+- Primary keys, foreign keys, and referential integrity.
+- Transactions for critical operations such as booking.
+- Derived vehicle availability: a vehicle is unavailable if it has an active rental or active maintenance record.
+- A scheduled MySQL event for completing expired rentals.
+
+Database schema and seed data are in `database/schema.sql`. The ER diagram and relational model are in `images/`.
+
+---
+
+## Project Structure
 
 ```text
-DBMS-Mini-Project/
-├── backend/
-│   ├── package-lock.json
-│   ├── package.json
-│   └── src/
-│       ├── app.js
-│       ├── config/
-│       │   └── db.js
-│       ├── controllers/
-│       │   ├── authController.js
-│       │   ├── branchController.js
-│       │   ├── customerController.js
-│       │   ├── dashboardController.js
-│       │   ├── maintenanceController.js
-│       │   ├── paymentController.js
-│       │   ├── rentalController.js
-│       │   └── vehicleController.js
-│       ├── middleware/
-│       │   ├── authMiddleware.js
-│       │   └── roleMiddleware.js
-│       ├── models/
-│       ├── routes/
-│       │   ├── authRoutes.js
-│       │   ├── branchRoutes.js
-│       │   ├── customerRoutes.js
-│       │   ├── dashboardRoutes.js
-│       │   ├── maintenanceRoutes.js
-│       │   ├── paymentRoutes.js
-│       │   ├── rentalRoutes.js
-│       │   └── vehicleRoutes.js
-│       ├── server.js
-│       └── services/
-├── images/
-│   ├── ER Diagram.png
-│   └── Relational Model.png
-└── README.md
+Directory structure:
+└── DBMS-Mini-Project/
+    ├── backend/
+    │   ├── package-lock.json
+    │   ├── package.json
+    │   └── src/
+    │       ├── app.js
+    │       ├── config/
+    │       │   └── db.js
+    │       ├── controllers/
+    │       │   ├── authController.js
+    │       │   ├── branchController.js
+    │       │   ├── customerController.js
+    │       │   ├── dashboardController.js
+    │       │   ├── maintenanceController.js
+    │       │   ├── paymentController.js
+    │       │   ├── rentalController.js
+    │       │   └── vehicleController.js
+    │       ├── middleware/
+    │       │   ├── authMiddleware.js
+    │       │   └── roleMiddleware.js
+    │       ├── routes/
+    │       │   ├── authRoutes.js
+    │       │   ├── branchRoutes.js
+    │       │   ├── customerRoutes.js
+    │       │   ├── dashboardRoutes.js
+    │       │   ├── maintenanceRoutes.js
+    │       │   ├── paymentRoutes.js
+    │       │   ├── rentalRoutes.js
+    │       │   └── vehicleRoutes.js
+    │       └── server.js
+    ├── database/
+    │   └── schema.sql
+    ├── frontend/
+    │   ├── eslint.config.js
+    │   ├── index.html
+    │   ├── package-lock.json
+    │   ├── package.json
+    │   ├── public/
+    │   │   └── car.svg
+    │   ├── src/
+    │   │   ├── App.css
+    │   │   ├── App.jsx
+    │   │   ├── assets/
+    │   │   │   ├── hero.png
+    │   │   │   ├── react.svg
+    │   │   │   └── vite.svg
+    │   │   ├── components/
+    │   │   │   ├── common/
+    │   │   │   │   ├── Alert.jsx
+    │   │   │   │   ├── ConfirmDialog.jsx
+    │   │   │   │   ├── EmptyState.jsx
+    │   │   │   │   ├── LoadingSpinner.jsx
+    │   │   │   │   ├── Modal.jsx
+    │   │   │   │   ├── Navbar.jsx
+    │   │   │   │   ├── ProtectedRoute.jsx
+    │   │   │   │   ├── Sidebar.jsx
+    │   │   │   │   ├── StatCard.jsx
+    │   │   │   │   └── StatusBadge.jsx
+    │   │   │   └── vehicles/
+    │   │   │       └── VehicleCard.jsx
+    │   │   ├── context/
+    │   │   │   └── AuthContext.jsx
+    │   │   ├── hooks/
+    │   │   │   └── useAuth.js
+    │   │   ├── index.css
+    │   │   ├── layouts/
+    │   │   │   ├── AdminLayout.jsx
+    │   │   │   └── CustomerLayout.jsx
+    │   │   ├── main.jsx
+    │   │   ├── pages/
+    │   │   │   ├── admin/
+    │   │   │   │   ├── AdminDashboard.jsx
+    │   │   │   │   ├── BranchManagement.jsx
+    │   │   │   │   ├── CustomerManagement.jsx
+    │   │   │   │   ├── MaintenanceManagement.jsx
+    │   │   │   │   ├── PaymentManagement.jsx
+    │   │   │   │   ├── RentalManagement.jsx
+    │   │   │   │   └── VehicleManagement.jsx
+    │   │   │   ├── auth/
+    │   │   │   │   ├── Login.jsx
+    │   │   │   │   └── Register.jsx
+    │   │   │   ├── common/
+    │   │   │   │   └── NotFound.jsx
+    │   │   │   └── customer/
+    │   │   │       ├── BookVehicle.jsx
+    │   │   │       ├── BrowseVehicles.jsx
+    │   │   │       ├── ConfirmationPage.jsx
+    │   │   │       ├── CustomerDashboard.jsx
+    │   │   │       ├── CustomerProfile.jsx
+    │   │   │       ├── MyRentals.jsx
+    │   │   │       ├── PaymentPage.jsx
+    │   │   │       └── VehicleDetails.jsx
+    │   │   ├── services/
+    │   │   │   ├── api.js
+    │   │   │   ├── authService.js
+    │   │   │   ├── branchService.js
+    │   │   │   ├── customerService.js
+    │   │   │   ├── dashboardService.js
+    │   │   │   ├── maintenanceService.js
+    │   │   │   ├── paymentService.js
+    │   │   │   ├── rentalService.js
+    │   │   │   └── vehicleService.js
+    │   │   └── utils/
+    │   │       └── formatters.js
+    │   └── vite.config.js
+    ├── images/
+    │   ├── Admin_Images/
+    │   │   ├── Admin-Branches.png
+    │   │   ├── Admin-Customers.png
+    │   │   ├── Admin-Dashboard.png
+    │   │   ├── Admin-Maintenance.png
+    │   │   ├── Admin-Payments.png
+    │   │   ├── Admin-Rentals.png
+    │   │   └── Admin-Vehicles.png
+    │   ├── Customer_Images/
+    │   │   ├── Customer-Dashboard.png
+    │   │   ├── Customer-Payment-Confirmation.png
+    │   │   ├── Customer-Payment-Page.png
+    │   │   ├── Customer-Profile.png
+    │   │   ├── Customer-Rental-History.png
+    │   │   ├── Customer-Rental-Page.png
+    │   │   └── Customer-Vehicles.png
+    │   ├── ER Diagram.png
+    │   └── Relational Model.png
+    └── README.md
 ```
 
-### 📌 Backend Structure
-
-| Directory/File     | Purpose                                     |
-| ------------------ | ------------------------------------------- |
-| `src/config/`      | Database configuration                      |
-| `src/controllers/` | Business logic for API endpoints            |
-| `src/middleware/`  | Authentication and role-based authorization |
-| `src/models/`      | Reserved for database models                |
-| `src/routes/`      | API route definitions                       |
-| `src/services/`    | Reserved for reusable service-layer logic   |
-| `app.js`           | Express application configuration           |
-| `server.js`        | Starts the backend server                   |
-
 ---
 
-## 🗄️ Database Design
-
-The backend is built around seven MySQL relations:
-
-* `USER_ACC`
-* `CUSTOMER`
-* `BRANCH`
-* `VEHICLE`
-* `RENTAL`
-* `PAYMENT`
-* `MAINTENANCE`
-
-The database uses primary keys, foreign keys, unique constraints, and other integrity constraints. The database design is normalized to **BCNF**.
-
-The complete ER diagram and relational model are available in the `images/` directory.
-
----
-
-# 🔐 API Endpoints
-
-All endpoints are prefixed with `/api`.
-
-Authentication-protected endpoints require a JWT:
-
-```http
-Authorization: Bearer <token>
-```
-
-### 👥 Access Levels
-
-| Role       | Description                                |
-| ---------- | ------------------------------------------ |
-| `Public`   | No authentication required                 |
-| `Customer` | Requires an authenticated customer account |
-| `Admin`    | Requires an authenticated admin account    |
-
----
-
-## 🔑 Authentication
-
-| Method | Endpoint             | Description                                     | Access           |
-| ------ | -------------------- | ----------------------------------------------- | ---------------- |
-| `POST` | `/api/auth/register` | Register a new customer account                 | Public           |
-| `POST` | `/api/auth/login`    | Authenticate a user and obtain a JWT            | Public           |
-| `GET`  | `/api/auth/me`       | Get details of the currently authenticated user | Customer / Admin |
-
----
-
-## 🚗 Vehicle Endpoints
-
-| Method   | Endpoint                     | Description                       | Access |
-| -------- | ---------------------------- | --------------------------------- | ------ |
-| `GET`    | `/api/vehicles`              | Get all vehicles                  | Admin  |
-| `GET`    | `/api/vehicles/available`    | Get currently available vehicles  | Public |
-| `GET`    | `/api/vehicles/:plateNumber` | Get details of a specific vehicle | Public |
-| `POST`   | `/api/vehicles`              | Add a new vehicle                 | Admin  |
-| `PUT`    | `/api/vehicles/:plateNumber` | Update vehicle details            | Admin  |
-| `DELETE` | `/api/vehicles/:plateNumber` | Delete a vehicle                  | Admin  |
-
-Vehicle availability is derived from the rental and maintenance data rather than being stored as a separate attribute.
-
----
-
-## 👤 Customer Endpoints
-
-| Method | Endpoint                     | Description                                      | Access   |
-| ------ | ---------------------------- | ------------------------------------------------ | -------- |
-| `GET`  | `/api/customers/me/rentals`  | Get rental history of the authenticated customer | Customer |
-| `GET`  | `/api/customers`             | Get all customers                                | Admin    |
-| `GET`  | `/api/customers/:customerId` | Get details and rental history of a customer     | Admin    |
-
----
-
-## 🚘 Rental Endpoints
-
-| Method | Endpoint                 | Description                      | Access           |
-| ------ | ------------------------ | -------------------------------- | ---------------- |
-| `POST` | `/api/rentals`           | Create a new rental              | Customer         |
-| `GET`  | `/api/rentals`           | Get rentals                      | Admin            |
-| `GET`  | `/api/rentals/:rentalId` | Get details of a specific rental | Customer / Admin |
-
-Rental creation validates:
-
-* Customer authentication
-* Vehicle existence
-* Active maintenance
-* Conflicting active rentals
-* Valid rental dates
-
-Rental status uses only:
-
-```text
-Active
-Completed
-```
-
-Completed rentals are automatically updated by a **MySQL Event Scheduler** based on their end date.
-
----
-
-## 💳 Payment Endpoints
-
-| Method | Endpoint                   | Description                       | Access           |
-| ------ | -------------------------- | --------------------------------- | ---------------- |
-| `POST` | `/api/payments`            | Record payment for a rental       | Customer / Admin |
-| `GET`  | `/api/payments`            | Get payment records               | Admin            |
-| `GET`  | `/api/payments/:paymentId` | Get details of a specific payment | Customer / Admin |
-
-Payment rules:
-
-* Payment status is always `Paid`
-* Each rental can have only one payment
-* Payment methods:
-
-  * `UPI`
-  * `Card`
-  * `Cash`
-* Payment amount must be greater than zero
-
----
-
-## 🔧 Maintenance Endpoints
-
-| Method   | Endpoint                          | Description                       | Access |
-| -------- | --------------------------------- | --------------------------------- | ------ |
-| `POST`   | `/api/maintenance`                | Add a maintenance record          | Admin  |
-| `GET`    | `/api/maintenance`                | Get maintenance records           | Admin  |
-| `GET`    | `/api/maintenance/:maintenanceId` | Get a specific maintenance record | Admin  |
-| `PUT`    | `/api/maintenance/:maintenanceId` | Update maintenance details        | Admin  |
-| `DELETE` | `/api/maintenance/:maintenanceId` | Delete a maintenance record       | Admin  |
-
-The backend prevents a vehicle with an active rental from being placed into active maintenance.
-
----
-
-## 🏢 Branch Endpoints
-
-| Method   | Endpoint                  | Description             | Access |
-| -------- | ------------------------- | ----------------------- | ------ |
-| `POST`   | `/api/branches`           | Create a branch         | Admin  |
-| `GET`    | `/api/branches`           | Get all branches        | Admin  |
-| `GET`    | `/api/branches/:branchId` | Get details of a branch | Admin  |
-| `PUT`    | `/api/branches/:branchId` | Update branch details   | Admin  |
-| `DELETE` | `/api/branches/:branchId` | Delete a branch         | Admin  |
-
----
-
-## 📊 Admin Dashboard
-
-| Method | Endpoint         | Description                            | Access |
-| ------ | ---------------- | -------------------------------------- | ------ |
-| `GET`  | `/api/dashboard` | Get dashboard statistics and summaries | Admin  |
-
-The dashboard currently provides:
-
-* Total vehicles
-* Available vehicles
-* Total customers
-* Active rentals
-* Active maintenance
-* Total revenue
-* Revenue by branch
-* Rentals by vehicle
-* Maintenance cost by vehicle
-
-The dashboard uses SQL aggregation, joins, grouping, and derived data.
-
----
-
-# 🔒 Authentication & Authorization
-
-The backend uses **JWT-based authentication**. The general authentication flow is:
-
-```text
-Login
-  ↓
-Credentials verified
-  ↓
-JWT generated
-  ↓
-Client stores token
-  ↓
-Token sent with protected requests
-  ↓
-authMiddleware.js
-  ↓
-roleMiddleware.js
-  ↓
-Controller
-```
-
-Role-based authorization supports two roles:
-
-```text
-customer
-admin
-```
-
-Customers cannot access admin-only endpoints, and administrative operations are protected by role-based middleware.
-
----
-
-# 🧠 Database Features
-
-The project is designed to demonstrate DBMS concepts rather than functioning as a simple CRUD application.
-
-The backend/database currently uses:
-
-* Primary keys
-* Foreign keys
-* Unique constraints
-* Referential integrity
-* SQL joins
-* Aggregate queries
-* Transactions
-* MySQL Event Scheduler
-* Role-based access through the backend
-
-### ⚙️ Automatic Rental Completion
-
-A MySQL scheduled event automatically changes `Active → Completed` when the rental's end date has passed.
-
----
-
-# 🚀 Local Setup
-
-## 1. 📥 Clone the Repository
+## Setup
+
+### Prerequisites
+- Node.js 18 or later
+- npm
+- MySQL 8 or later
+- Git
+
+### 1. Clone the repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/vryeshwanth/DBMS-Mini-Project.git
 cd DBMS-Mini-Project
 ```
 
----
+### 2. Set up the database
 
-## 2. 📦 Install Backend Dependencies
+Start MySQL, then run:
 
-Navigate to the backend directory:
+```bash
+mysql -u root -p < database/schema.sql
+```
+
+Alternatively, execute `database/schema.sql` in MySQL Workbench. The script creates the database and tables and inserts initial seed data.
+
+### 3. Configure and start the backend
 
 ```bash
 cd backend
-```
-
-Install the required packages:
-
-```bash
 npm install
 ```
 
----
+Create a `.env` file. The expected variables are:
 
-## 3. 🗄️ Set Up MySQL
-
-Make sure MySQL Server is installed and running.
-
-Create the project database in MySQL:
-
-```sql
-CREATE DATABASE vehicle_rental_db;
+```env
+PORT=5000
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=your_mysql_password
+DB_NAME=vehicle_rental_db
+DB_PORT=3306
+JWT_SECRET=replace_with_a_secure_secret
+JWT_EXPIRES_IN=1d
 ```
 
-Then select it:
+Start the API:
+
+```bash
+npm run dev
+```
+
+If a development script is not available, use `npm start`.
+
+Check the API at `http://localhost:5000/api/health`.
+
+### 4. Start the frontend
+
+Open a second terminal:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Open the local URL printed by Vite. The project is configured to proxy `/api` requests to the backend on port `5000`; the configured frontend port is `3000`.
+
+### 5. Test the application
+
+1. Register a customer account and log in.
+2. Browse vehicles, make a booking, and test the payment simulation.
+3. To test the admin portal, update a registered user's role in MySQL:
 
 ```sql
 USE vehicle_rental_db;
+UPDATE USER_ACC
+SET role = 'admin'
+WHERE email = 'your_registered_email@example.com';
 ```
 
-Execute the SQL script containing:
-
-* Table definitions
-* Primary keys
-* Foreign keys
-* Unique constraints
-* Database triggers
-* Event Scheduler configuration
-
-Also insert the required sample data.
-
-> The database name and credentials should match the configuration used by `src/config/db.js`.
+Log out and log back in.
 
 ---
 
-## 4. 🔐 Configure Database Connection
+## API Endpoints
 
-Update:
-
-```text
-backend/src/config/db.js
-```
-
-with your local MySQL configuration.
-
-Example:
-
-```js
-const mysql = require("mysql2/promise");
-
-const pool = mysql.createPool({
-    host: "localhost",
-    user: "root",
-    password: "your_password",
-    database: "vehicle_rental_db"
-});
-
-module.exports = pool;
-```
-
-Do not commit actual database passwords to GitHub.
-
----
-
-## 5. ▶️ Start the Backend
-
-From the `backend` directory:
-
-```bash
-node src/server.js
-```
-
-If a development script is configured in `package.json`, you can also use:
-
-```bash
-npm start
-```
-
-The server should start on the configured port.
-
----
-
-## 6. 🧪 Test the API
-
-The endpoints can be tested using **Postman** or another API testing tool.
-
-For example:
-
-```http
-GET http://localhost:5000/api/vehicles/available
-```
-
-For protected endpoints, include:
+All endpoints use the `/api` prefix. Protected endpoints require the following header:
 
 ```http
 Authorization: Bearer <JWT_TOKEN>
 ```
 
+### Authentication and User Management
+
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| `POST` | `/api/auth/register` | Register a customer account | Public |
+| `POST` | `/api/auth/login` | Log in and receive a JWT | Public |
+| `GET` | `/api/auth/me` | Get the authenticated user's profile | Authenticated |
+| `PUT` | `/api/auth/me` | Update the authenticated user's profile | Authenticated |
+
+### Vehicles
+
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| `GET` | `/api/vehicles` | List all vehicles | Public |
+| `GET` | `/api/vehicles/available` | List available vehicles | Public |
+| `GET` | `/api/vehicles/:plateNumber` | Get vehicle details | Public |
+| `POST` | `/api/vehicles` | Add a vehicle | Admin |
+| `PUT` | `/api/vehicles/:plateNumber` | Update vehicle details | Admin |
+| `DELETE` | `/api/vehicles/:plateNumber` | Remove a vehicle | Admin |
+
+### Rentals
+
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| `POST` | `/api/rentals` | Book a vehicle | Customer |
+| `GET` | `/api/rentals` | List rentals (customers see their own; admins see all) | Authenticated |
+| `GET` | `/api/rentals/:rentalId` | Get details for a rental | Authenticated |
+
+### Payments
+
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| `POST` | `/api/payments` | Record a rental payment | Authenticated |
+| `GET` | `/api/payments` | List payments (customers see their own; admins see all) | Authenticated |
+| `GET` | `/api/payments/:paymentId` | Get payment details | Authenticated |
+
+### Maintenance
+
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| `POST` | `/api/maintenance` | Create a maintenance record | Admin |
+| `GET` | `/api/maintenance` | List maintenance records | Admin |
+| `GET` | `/api/maintenance/:maintenanceId` | Get a maintenance record | Admin |
+| `PUT` | `/api/maintenance/:maintenanceId` | Update a maintenance record | Admin |
+| `DELETE` | `/api/maintenance/:maintenanceId` | Delete a maintenance record | Admin |
+
+### Branches
+
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| `POST` | `/api/branches` | Create a branch | Admin |
+| `GET` | `/api/branches` | List branches | Admin |
+| `GET` | `/api/branches/:branchId` | Get branch details | Admin |
+| `PUT` | `/api/branches/:branchId` | Update branch details | Admin |
+
+### Customers
+
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| `GET` | `/api/customers/me/rentals` | Get the authenticated customer's rental history | Customer |
+| `GET` | `/api/customers` | List registered customers | Admin |
+| `GET` | `/api/customers/:customerId` | Get a customer's profile and rental history | Admin |
+
+### Dashboard and Analytics
+
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| `GET` | `/api/dashboard` | Get summary metrics, revenue, vehicle utilization, and maintenance expenses | Admin |
+
+### Health Check
+
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| `GET` | `/api/health` | Check API server status | Public |
+
+## Security and Business Rules
+
+- Passwords are hashed with bcrypt; they are not stored as plaintext.
+- JWT authentication and role-based access control protect restricted API routes.
+- Booking logic checks vehicle availability and overlapping active rentals.
+- Vehicles with active rentals cannot be placed into maintenance.
+- Foreign key constraints protect related records from invalid deletion.
+- Expired or invalid sessions are handled by the frontend API client.
+
 ---
 
-## 📐 Project Documentation
+## Screenshots
 
-The following database design diagrams are available under `images/`:
+1. E-R Diagram
+![E-R Diagram](./images/ER%20Diagram.png)
 
-* `ER Diagram.png`
-* `Relational Model.png`
+2. Relation Schema
+![Relation Schema](./images/Relational%20Model.png)
 
-These represent the database design used by the backend.
+Please refer to the website images under `images\Admin_Images` and `images\Customer_Images`
+
+---
