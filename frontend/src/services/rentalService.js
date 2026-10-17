@@ -18,6 +18,12 @@ export const rentalService = {
     const response = await api.get(`/rentals/${encodeURIComponent(rentalId)}`);
     return response.data;
   },
+
+  // POST /api/rentals/sync (Trigger rental completion sync)
+  syncRentals: async () => {
+    const response = await api.post('/rentals/sync');
+    return response.data;
+  },
 };
 
 export default rentalService;

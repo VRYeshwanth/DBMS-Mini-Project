@@ -1,7 +1,9 @@
 const pool = require("../config/db");
+const { syncRentalStatuses } = require("../utils/rentalStatusSync");
 
 const getAllVehicles = async (req, res) => {
     try {
+        await syncRentalStatuses();
         const [rows] = await pool.query("SELECT * FROM VEHICLE");
 
         res.status(200).json({
@@ -287,6 +289,7 @@ const deleteVehicle = async (req, res) => {
 
 const getAvailableVehicles = async (req, res) => {
     try {
+        await syncRentalStatuses();
         const [rows] = await pool.query(`
             SELECT
                 v.plate_number,

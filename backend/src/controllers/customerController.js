@@ -1,7 +1,9 @@
 const pool = require("../config/db");
+const { syncRentalStatuses } = require("../utils/rentalStatusSync");
 
 const getMyRentals = async (req, res) => {
     try {
+        await syncRentalStatuses();
         const [rows] = await pool.query(
             `SELECT
                 r.rental_id,
@@ -87,6 +89,7 @@ const getCustomerById = async (req, res) => {
     const { customerId } = req.params;
 
     try {
+        await syncRentalStatuses();
         const [customers] = await pool.query(
             `SELECT
                 c.customer_id,

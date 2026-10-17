@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const { syncRentalStatuses } = require("../utils/rentalStatusSync");
 
 
 const createRental = async (req, res) => {
@@ -34,6 +35,7 @@ const createRental = async (req, res) => {
 
     try {
         await connection.beginTransaction();
+        await syncRentalStatuses(connection);
 
         /*
          * Find the customer associated with the
@@ -214,6 +216,8 @@ const createRental = async (req, res) => {
 
 const getAllRentals = async (req, res) => {
     try {
+        await syncRentalStatuses();
+
         let rows;
 
         if (req.user.role === "admin") {
@@ -284,6 +288,8 @@ const getRentalById = async (req, res) => {
     const { rentalId } = req.params;
 
     try {
+        await syncRentalStatuses();
+
         const [rows] = await pool.query(
             `SELECT
                 r.rental_id,
@@ -357,8 +363,26 @@ const getRentalById = async (req, res) => {
 };
 
 
+const syncRentals = async (req, res) => {
+    try {
+        const count = await syncRentalStatuses();
+        res.status(200).json({
+            success: true,
+            message: `Rental status synchronization completed. ${count} rental(s) updated to Completed.`,
+            updatedCount: count
+        });
+    } catch (error) {
+        console.error("Manual sync rentals error:", error.message);
+        res.status(500).json({
+            success: false,
+            message: "Failed to synchronize rental statuses"
+        });
+    }
+};
+
 module.exports = {
     createRental,
     getAllRentals,
-    getRentalById
+    getRentalById,
+    syncRentals
 };

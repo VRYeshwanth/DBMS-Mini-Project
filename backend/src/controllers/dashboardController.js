@@ -1,7 +1,10 @@
 const pool = require("../config/db");
+const { syncRentalStatuses } = require("../utils/rentalStatusSync");
 
 const getDashboard = async (req, res) => {
     try {
+        await syncRentalStatuses();
+
         // Total vehicles
         const [vehicleCount] = await pool.query(
             `SELECT COUNT(*) AS total_vehicles

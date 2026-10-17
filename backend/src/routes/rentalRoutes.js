@@ -3,12 +3,19 @@ const express = require("express");
 const {
     createRental,
     getAllRentals,
-    getRentalById
+    getRentalById,
+    syncRentals
 } = require("../controllers/rentalController");
 
 const authenticate = require("../middleware/authMiddleware");
 
 const router = express.Router();
+
+router.post(
+    "/sync",
+    authenticate,
+    syncRentals
+);
 
 router.post(
     "/",

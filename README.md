@@ -57,7 +57,7 @@ Key DBMS concepts demonstrated:
 - Primary keys, foreign keys, and referential integrity.
 - Transactions for critical operations such as booking.
 - Derived vehicle availability: a vehicle is unavailable if it has an active rental or active maintenance record.
-- A scheduled MySQL event for completing expired rentals.
+- Automated rental completion: expired rentals are automatically updated to `Completed` on application load, on startup, periodically every 60s, and via the MySQL Event Scheduler.
 
 Database schema and seed data are in `database/schema.sql`. The ER diagram and relational model are in `images/`.
 
@@ -96,7 +96,9 @@ Directory structure:
     │       │   ├── paymentRoutes.js
     │       │   ├── rentalRoutes.js
     │       │   └── vehicleRoutes.js
-    │       └── server.js
+    │       ├── server.js
+    │       └── utils/
+    │           └── rentalStatusSync.js
     ├── database/
     │   └── schema.sql
     ├── frontend/
@@ -315,6 +317,7 @@ Authorization: Bearer <JWT_TOKEN>
 | `POST` | `/api/rentals` | Book a vehicle | Customer |
 | `GET` | `/api/rentals` | List rentals (customers see their own; admins see all) | Authenticated |
 | `GET` | `/api/rentals/:rentalId` | Get details for a rental | Authenticated |
+| `POST` | `/api/rentals/sync` | Manually trigger sync of expired rentals to Completed | Authenticated |
 
 ### Payments
 
